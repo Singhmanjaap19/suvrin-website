@@ -36,7 +36,7 @@ export default function OdooSaas({
   description = "Eliminate deployment delays, DevOps complexity, & scaling issues with Suvrin Odoo SaaS Toolkit. Now, launch, manage, and monitor your Odoo SaaS efficiently with rapid deployments and zero DevOps dependency. Built for high scalability, our Odoo SaaS engine allows you to create hundreds to thousands of Odoo instances within minutes. Powered by enterprise-grade features, it delivers secure, reliable Odoo hosting so that you can scale with confidence.",
   primaryCtaText = "Get your 30-day Free Trial",
   secondaryCtaText = "Try Now",
-  imageSrc = "/image.png",
+  imageSrc = "/odoo-saas-dashboard.jpg",
 }: OdooSaasProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"trial" | "demo">("trial");
