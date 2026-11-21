@@ -73,9 +73,39 @@ const TABS: BeyondSoftwareTab[] = [
 export default function BeyondSoftware() {
   const [activeTabId, setActiveTabId] = useState<string>("consulting");
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
+  const [isConsultModalOpen, setIsConsultModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    message: "",
+  });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   const mobileDropdownRef = useRef<HTMLDivElement>(null);
 
   const activeTab = TABS.find((t) => t.id === activeTabId) || TABS[0];
+
+  // Close modal on Escape key press and manage body scroll
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isConsultModalOpen) {
+        setIsConsultModalOpen(false);
+      }
+    };
+    if (isConsultModalOpen) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isConsultModalOpen]);
 
   // Close dropdown on outside tap / click
   useEffect(() => {
@@ -95,6 +125,50 @@ export default function BeyondSoftware() {
     };
   }, []);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const newErrors: { [key: string]: string } = {};
+    if (!formData.name.trim()) newErrors.name = "Full name is required";
+    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
+    if (!formData.email.trim() || !/^\S+@\S+\.\S+$/i.test(formData.email)) {
+      newErrors.email = "Valid work email is required";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+    setIsSubmitting(true);
+
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          message: formData.message || `Consultation request on ${activeTab.title}`,
+          engagementType: `ERP Consultation (${activeTab.title})`,
+        }),
+      });
+    } catch (err) {
+      console.warn("Consultation inquiry submission:", err);
+    }
+
+    setIsSubmitting(false);
+    setSubmitted(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsConsultModalOpen(false);
+    setSubmitted(false);
+    setFormData({ name: "", phone: "", email: "", message: "" });
+    setErrors({});
+  };
+
   return (
     <section
       id="consulting-methodology"
@@ -102,7 +176,7 @@ export default function BeyondSoftware() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Header Section */}
-        <div className="flex flex-col md:flex-row md:items-start md:justify-around gap-4 sm:gap-8 mb-10 sm:mb-14">
+        <div className="flex flex-col md:flex-row md:items-start sm:gap-8 mb-10 sm:mb-14">
           <div>
             {/* Tag in Suvrin Blue */}
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-blue-200/80 bg-blue-50/60 text-[#003bbd] text-xs font-bold tracking-wider uppercase mb-3 shadow-2xs">
@@ -122,7 +196,7 @@ export default function BeyondSoftware() {
           </div>
 
           {/* Subtitle Aligned Right on Desktop */}
-          <p className="text-xs sm:text-[13.5px] text-slate-600 leading-relaxed max-w-sm md:text-left float-left font-normal pt-1 mt-1 md:mt-8">
+          <p className="text-xs sm:text-[13.5px] text-slate-600 leading-relaxed max-w-sm md:text-left float-left font-normal pt-4 mt-1 md:mt-8">
             We audit your real-world factory routing, scrap rates, and
             multi-currency supply chain before configuring Odoo.
           </p>
@@ -328,12 +402,16 @@ export default function BeyondSoftware() {
             {/* Bottom Actions Row */}
             <div className="pt-6 border-t border-slate-200/80 flex flex-wrap items-center gap-4">
               {/* Primary Consultation Button in Suvrin Blue */}
-              <a
-                href="#contact"
+              <button
+                type="button"
+                onClick={() => {
+                  setIsConsultModalOpen(true);
+                  setSubmitted(false);
+                }}
                 className="inline-flex items-center justify-center px-6 sm:px-7 py-3 rounded-xl font-semibold text-xs sm:text-sm text-white bg-[#003bbd] hover:bg-[#002f9e] shadow-md shadow-blue-800/20 hover:shadow-lg hover:shadow-blue-900/30 active:scale-[0.99] transition-all duration-200 cursor-pointer"
               >
                 Schedule a Consultation
-              </a>
+              </button>
 
               {/* Secondary Link: Ask an Architect */}
               <a
@@ -362,6 +440,214 @@ export default function BeyondSoftware() {
           </div>
         </div>
       </div>
+
+      {/* ================= SCHEDULE A CONSULTATION MODAL ================= */}
+      {isConsultModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) handleCloseModal();
+          }}
+        >
+          <div
+            className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="consultation-modal-title"
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-100">
+              <div>
+                <div className="inline-flex items-center space-x-1.5 mb-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#003bbd]" />
+                  <span className="w-2 h-2 rounded-full bg-[#70a647]" />
+                  <span className="w-2 h-2 rounded-full bg-[#002f9e]" />
+                  <span className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500 ml-1">
+                    Suvrin Consultation
+                  </span>
+                </div>
+                <h3
+                  id="consultation-modal-title"
+                  className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight"
+                >
+                  Schedule a Consultation
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Phase: <span className="font-semibold text-[#003bbd]">{activeTab.title}</span>
+                </p>
+              </div>
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                aria-label="Close modal"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 pt-5">
+              {submitted ? (
+                /* Success Confirmation State */
+                <div className="text-center py-6 space-y-4 animate-in fade-in">
+                  <div className="w-16 h-16 rounded-full bg-blue-50 border-2 border-[#003bbd] text-[#003bbd] mx-auto flex items-center justify-center shadow-xs">
+                    <svg
+                      className="w-8 h-8"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h4 className="text-xl font-bold text-slate-900">
+                    Thank You, {formData.name || "Partner"}!
+                  </h4>
+                  <p className="text-xs sm:text-[13.5px] text-slate-600 max-w-sm mx-auto leading-relaxed">
+                    Your consultation request has been received. Our senior Odoo technical consultant will connect with you within 2 business hours.
+                  </p>
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={handleCloseModal}
+                      className="px-7 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#003bbd] hover:bg-[#002f9e] transition-colors cursor-pointer shadow-sm hover:shadow"
+                    >
+                      Close Window
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Consultation Form */
+                <form onSubmit={handleSubmit} className="space-y-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Full Name */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Full Name <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => {
+                          setFormData({ ...formData, name: e.target.value });
+                          if (errors.name) setErrors({ ...errors, name: "" });
+                        }}
+                        placeholder="John Doe"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#003bbd]/30 focus:border-[#003bbd] transition-all bg-slate-50/50"
+                      />
+                      {errors.name && (
+                        <p className="text-[11px] text-rose-500 mt-1">{errors.name}</p>
+                      )}
+                    </div>
+
+                    {/* Phone Number */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Phone Number <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => {
+                          setFormData({ ...formData, phone: e.target.value });
+                          if (errors.phone) setErrors({ ...errors, phone: "" });
+                        }}
+                        placeholder="+971 50 123 4567"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#003bbd]/30 focus:border-[#003bbd] transition-all bg-slate-50/50"
+                      />
+                      {errors.phone && (
+                        <p className="text-[11px] text-rose-500 mt-1">{errors.phone}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Work Email */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Work Email <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => {
+                        setFormData({ ...formData, email: e.target.value });
+                        if (errors.email) setErrors({ ...errors, email: "" });
+                      }}
+                      placeholder="john@company.com"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#003bbd]/30 focus:border-[#003bbd] transition-all bg-slate-50/50"
+                    />
+                    {errors.email && (
+                      <p className="text-[11px] text-rose-500 mt-1">{errors.email}</p>
+                    )}
+                  </div>
+
+                  {/* Consultation Requirements / Notes */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Consultation Notes / Scope <span className="text-slate-400 font-normal">(Optional)</span>
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      placeholder={`Tell us about your requirements for ${activeTab.title}...`}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#003bbd]/30 focus:border-[#003bbd] transition-all bg-slate-50/50 resize-none"
+                    />
+                  </div>
+
+                  {/* Submit Button in Suvrin Blue */}
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full py-3 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#003bbd] hover:bg-[#002f9e] transition-all duration-200 shadow-md shadow-blue-800/20 active:scale-[0.99] disabled:opacity-70 cursor-pointer flex items-center justify-center space-x-2"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <svg
+                            className="animate-spin h-4 w-4 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
+                          </svg>
+                          <span>Submitting Request...</span>
+                        </>
+                      ) : (
+                        <span>Request Free Consultation</span>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

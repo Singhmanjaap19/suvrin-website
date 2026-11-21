@@ -181,8 +181,8 @@ const ODOO_SERVICES: OdooServiceItem[] = [
 ];
 
 export default function OdooServices() {
-  // Default active item set to "customization" matching user reference photo
-  const [activeServiceId, setActiveServiceId] = useState<string>("customization");
+  // Default active item set to 1st service ("implementation")
+  const [activeServiceId, setActiveServiceId] = useState<string>("implementation");
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
