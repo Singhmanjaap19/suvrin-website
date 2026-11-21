@@ -73,7 +73,7 @@ export default function ImplementationTimeline() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="max-w-3xl mb-10 sm:mb-14">
+        <div className="max-w-3xl mb-8 sm:mb-12">
           {/* Tag with Suvrin 3 Brand Dots */}
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-blue-200/80 bg-blue-50/60 text-[#003bbd] text-xs font-bold tracking-wider uppercase mb-3.5 shadow-2xs">
             <span className="w-1.5 h-1.5 rounded-full bg-[#003bbd]" />

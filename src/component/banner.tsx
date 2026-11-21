@@ -47,7 +47,7 @@ export default function Banner() {
   return (
     <section
       aria-label="Our Trusted Partners"
-      className="relative w-full bg-slate-50/70 py-14 sm:py-16 lg:py-20 border-b border-slate-100 select-none overflow-hidden font-sans"
+      className="relative w-full bg-slate-50/70 py-16 sm:py-20 lg:py-24 border-b border-slate-100 select-none overflow-hidden font-sans"
     >
       {/* Hardware-Accelerated Marquee Styles */}
       <style>{`

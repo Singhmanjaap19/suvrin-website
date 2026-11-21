@@ -105,7 +105,7 @@ export default function OdooSaas({
   return (
     <section
       id="odoo-saas"
-      className="relative w-full bg-white py-14 sm:py-18 lg:py-22 border-b border-slate-100 overflow-hidden font-sans scroll-mt-20"
+      className="relative w-full bg-white py-16 sm:py-20 lg:py-24 border-b border-slate-100 overflow-hidden font-sans scroll-mt-20"
     >
       {/* Decorative Technical Background Grid */}
      

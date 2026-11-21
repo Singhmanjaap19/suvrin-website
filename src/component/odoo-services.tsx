@@ -312,15 +312,16 @@ export default function OdooServices() {
   return (
     <section
       id="services"
-      className="relative w-full bg-white py-14 sm:py-18 lg:py-20 border-b border-slate-100 overflow-hidden font-sans scroll-mt-20"
+      className="relative w-full bg-white py-16 sm:py-20 lg:py-24 border-b border-slate-100 overflow-hidden font-sans scroll-mt-20"
     >
       {/* Decorative Technical Background Grid */}
      
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top Header Row: Title on Left, Subtitle on Right */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 pb-4 border-b border-slate-100 gap-4 sm:gap-6">
-          <div>
+        {/* Top Header Row: 12-col grid aligned with content below (LHS 5 cols, RHS 7 cols) */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-10 mb-8 sm:mb-10 pb-4 border-b border-slate-100 items-end">
+          {/* LHS Title Column (Cols 5 on md/lg) */}
+          <div className="md:col-span-5">
             <div className="inline-flex items-center space-x-1.5 mb-2.5">
               <span className="w-2 h-2 rounded-full bg-[#003bbd]" />
               <span className="w-2 h-2 rounded-full bg-[#70a647]" />
@@ -335,11 +336,14 @@ export default function OdooServices() {
             </h2>
           </div>
 
-          <p className="text-xs sm:text-[13.5px] lg:text-[14px] text-slate-600 max-w-md leading-relaxed md:text-right">
-            Suvrin Technologies offers a suite of AI-enabled Odoo development
-            services, from initial consultation and implementation to migration to
-            the latest Odoo version.
-          </p>
+          {/* RHS Subtitle Column (Cols 7 on md/lg): Shifted directly to center of RHS content */}
+          <div className="md:col-span-7 flex md:justify-center">
+            <p className="text-xs sm:text-[13.5px] lg:text-[14px] text-slate-600 max-w-md leading-relaxed text-left md:text-left">
+              Suvrin Technologies offers a suite of AI-enabled Odoo development
+              services, from initial consultation and implementation to migration to
+              the latest Odoo version.
+            </p>
+          </div>
         </div>
 
         {/* ================= MOBILE OPTION SELECTOR (Option type for < md) ================= */}
@@ -522,8 +526,7 @@ export default function OdooServices() {
                   style={{
                     height: "35%",
                     transform: `translateY(${scrollProgress * 185.7}%)`,
-                    background:
-                      "linear-gradient(to bottom, #0052cc 0%, #70a647 50%, #0a1931 100%)",
+                    background:"#003bbd",
                   }}
                 />
               </div>

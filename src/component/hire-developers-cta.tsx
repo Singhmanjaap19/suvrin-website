@@ -84,10 +84,10 @@ export default function HireDevelopersCta({
   };
 
   return (
-    <section className="relative w-full bg-white py-14 sm:py-18 lg:py-20 border-b border-slate-100 overflow-hidden font-sans">
+    <section className="relative w-full bg-white py-16 sm:py-20 lg:py-24 border-b border-slate-100 overflow-hidden font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main CTA Banner Card styled with Suvrin Brand Gradient & Lighting */}
-        <div className="relative rounded-3xl sm:rounded-[36px] overflow-hidden p-8 sm:p-12 lg:p-16 text-center shadow-2xl shadow-blue-900/25 ring-1 ring-white/20">
+        <div className="relative rounded-3xl sm:rounded-[36px] overflow-hidden p-6 sm:p-10 lg:p-16 text-center shadow-2xl shadow-blue-900/25 ring-1 ring-white/20">
           {/* Suvrin Project Color Gradient */}
           <div
             className="absolute inset-0 bg-[#0043a8]"
